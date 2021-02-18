@@ -17,6 +17,8 @@ class Knight
 end
 
 def knight_moves(start, finish)
+  
+  require 'colorize'
   if start == finish
     puts "The knight doesn't need to travel"
     exit
@@ -24,20 +26,38 @@ def knight_moves(start, finish)
   moves = [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]]
   queue = Array.new [start]
   p queue
-  queue.each do |item|
-    next if item.is_a? Integer
+  until queue.empty?
+    queue.each { |item| puts "#{item}".light_red }
+    item = queue[0]
 
-    p "queue: #{queue} item: #{item}"
+    if item.flatten.length == 2
+      current_item = item
+    else
+      current_item = item[-1]
+    end 
+    if item.is_a? Integer
+      next
+      queue.shift
+    end
+
+    puts "item: #{item}".red
+    puts "current #{current_item}".yellow
     moves.each do |move|
-      p "move: #{move}"
-      new_move = [item[0] + move[0], item[1] + move[1]]
+      puts "modifier: #{move}".cyan
+      new_move = [current_item[0] + move[0], current_item[1] + move[1]]
+      next if item.any? { |coord| coord == new_move }
+
+      puts "new move #{new_move}".green
       next unless valid?(new_move)
 
-      puts "#{new_move}"
-      reach_end(start, new_move) if new_move == finish
-      # modded_item = 
-      queue.push [item[0], new_move]
+      reach_end(item, new_move) if new_move == finish
+      if item.flatten.length == 2
+        queue.push [item, new_move]
+      else
+        queue.push item + [new_move]
+      end
     end
+    queue.shift
   end
 end
 
@@ -48,11 +68,13 @@ def valid?(move)
 end
 
 def reach_end(start, finish)
+  p "start #{start} finish #{finish}"
   if start.flatten.length == 2
     start = [start, finish]
   else
     start.push finish
   end
+  create_board
   puts "The knight reaches its destination in #{start.length - 1} move#{'s' if start.length == 1}. Here's its trail:"
   start.each_with_index do |move, ind|
     p move
@@ -97,4 +119,4 @@ def create_board
   puts "       A       B       C       D       E       F       G       H\n"
 end
 
-knight_moves([3, 7], [2, 5])
+knight_moves([1, 1], [8, 8])
