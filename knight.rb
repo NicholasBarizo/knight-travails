@@ -17,6 +17,13 @@ class Knight
 end
 
 def knight_moves(start, finish)
+  puts 'Would you like to see the calculations live? (y/n)'
+  show_calc = gets.chomp
+  until show_calc == 'y' || show_calc == 'n'
+    puts 'Would you like to see the calculatinons live? (y/n)'
+    show_calc = gets.chomp
+  end
+
   require 'colorize'
   if start == finish
     puts "The knight doesn't need to travel"
@@ -26,7 +33,7 @@ def knight_moves(start, finish)
   queue = Array.new [start]
   until queue.empty?
     item = queue[0]
-
+    create_board(item) if show_calc == 'y'
     if item.flatten.length == 2
       current_item = item
     else
@@ -91,6 +98,7 @@ def convert_to_coords(start)
 end
 
 def create_board(start)
+  sleep(1.0/20)
   8.downto(1) do |ind|
     create_row(ind, start)
   end
@@ -112,9 +120,9 @@ def create_cell(row, column, coords)
   move = '       '
   pos = [column, row]
   coords.each_with_index do |coord, ind|
-    move = "   #{ind}   " if pos == coord
-    move = ' Start ' if ind.zero? && pos == coord
-    move = 'Finish ' if ind == coords.length - 1 && pos == coord
+    move = "   #{ind}   ".light_yellow if pos == coord
+    move = ' Start '.red if ind.zero? && pos == coord
+    move = 'Finish '.green if ind == coords.length - 1 && pos == coord
   end
   print "#{move}|"
 end
