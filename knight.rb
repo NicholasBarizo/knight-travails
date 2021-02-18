@@ -74,7 +74,7 @@ def reach_end(start, finish)
     start.push finish
   end
   coords = convert_to_coords(start)
-  create_board
+  create_board(start)
   puts "The knight reaches its destination in #{start.length - 1} move#{'s' if start.length == 1}. Here's its trail:"
   coords.each_with_index do |coord, ind|
     pos = "Move #{ind}"
@@ -100,18 +100,26 @@ def convert_to_coords(start)
   start
 end
 
-def create_board
+def create_board(start)
   8.downto(1) do |ind|
-    create_row(ind)
+    create_row(ind, start)
   end
   puts '   +-------+-------+-------+-------+-------+-------+-------+-------+'
   puts "       A       B       C       D       E       F       G       H\n\n"
 end
 
-def create_row(ind)
+def create_row(row, coords)
   puts '   +-------+-------+-------+-------+-------+-------+-------+-------+'
   puts '   |       |       |       |       |       |       |       |       |'
-  puts " #{ind} |       |       |       |       |       |       |       |       |"
-  puts '   |       |       |       |       |       |       |       |       |'
+  print " #{row} |"
+  8.times do |column|
+    create_cell(row, column, coords)
+  end
+  puts "\n   |       |       |       |       |       |       |       |       |"
 end
+
+def create_cell(row, column, coords)
+  print "   #{row}   |"
+end
+
 knight_moves([2, 2], [1, 1])
