@@ -51,9 +51,7 @@ public
 class ShowBoard
   def create_board(start)
     sleep(1.0/20)
-    8.downto(1) do |ind|
-      create_row(ind, start)
-    end
+    8.downto(1) { |ind| create_row(ind, start) }
     puts '   +-------+-------+-------+-------+-------+-------+-------+-------+'
     puts "       A       B       C       D       E       F       G       H\n\n"
   end
@@ -62,19 +60,17 @@ class ShowBoard
     puts '   +-------+-------+-------+-------+-------+-------+-------+-------+'
     puts '   |       |       |       |       |       |       |       |       |'
     print " #{row} |"
-    8.times do |column|
-      create_cell(row, column + 1, coords)
-    end
+    8.times { |column| create_cell(row, column + 1, coords) }
     puts "\n   |       |       |       |       |       |       |       |       |"
   end
 
-  def create_cell(row, column, coords)
-    move = '       '
-    pos = [column, row]
+  def create_cell(row, column, coords, move = '       ', pos = [column, row])
     coords.each_with_index do |coord, ind|
-      move = "   #{ind}   ".light_yellow if pos == coord
-      move = ' Start '.red if ind.zero? && pos == coord
-      move = 'Finish '.green if ind == coords.length - 1 && pos == coord
+      next unless pos == coord
+
+      move = "   #{ind}   ".light_yellow
+      move = ' Start '.red if ind.zero?
+      move = 'Finish '.green if ind == coords.length - 1
     end
     print "#{move}|"
   end
