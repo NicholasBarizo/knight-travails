@@ -29,7 +29,7 @@ class Knight
         next if item.any? { |coord| coord == new_move }
         next unless valid?(new_move)
 
-        ReachEnd.new.show_path(item, new_move) if new_move == finish
+        ReachEnd.new.reach_end(item, new_move) if new_move == finish
         if item.flatten.length == 2
           queue.push [item, new_move]
         else
@@ -82,39 +82,32 @@ end
 
 # Shows results when the knight reaches the end
 class ReachEnd
-  def show_path(start, finish)
-    if start.flatten.length == 2
-      start = [start, finish]
-    else
-      start.push finish
-    end
-    coords = convert_to_coords(start)
+  def reach_end(start, finish)
     ShowBoard.new.create_board(start)
     puts "The knight reaches its destination in #{start.length - 1} move#{'s' if start.length > 1}. Here is its trail:"
+    show_path(convert_to_coords(combine_start_finish(start, finish)))
+    exit
+  end
+
+  def show_path(coords)
     coords.each_with_index do |coord, ind|
       pos = "Move #{ind}"
       pos = 'Start' if ind == 0
       puts "#{pos}: #{coord.join}"
     end
-    exit
   end
 
-  def convert_to_coords(start)
-    coord = []
-    start.each_with_index do |move, ind|
-      coord.push case move[0]
-                 when 1 then ['A', move[1]]
-                 when 2 then ['B', move[1]]
-                 when 3 then ['C', move[1]]
-                 when 4 then ['D', move[1]]
-                 when 5 then ['E', move[1]]
-                 when 6 then ['F', move[1]]
-                 when 7 then ['G', move[1]]
-                 when 8 then ['H', move[1]]
-                 end
-      coord[ind][1] = move[1]
+  def combine_start_finish(start, finish)
+    if start.flatten.length == 2
+      start = [start, finish]
+    else
+      start.push finish
     end
-    coord
+    start
+  end
+
+  def convert_to_coords(start, possible_x = %w[A B C D E F G H])
+    start.map { |move| [possible_x[move[0] - 1], move[1]] }
   end
 end
 
