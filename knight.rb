@@ -3,45 +3,59 @@
 # Gets path from inputted start to finish
 class Knight
   def knight_moves(start, finish)
-    puts 'Would you like to see the calculations live? (y/n)'
-    show_calc = gets.chomp
-    until %w[y n].include? show_calc
-      puts 'Would you like to see the calculatinons live? (y/n)'
-      show_calc = gets.chomp
-    end
-
+    @finish = finish
     require 'colorize'
     if start == finish
       puts "The knight doesn't need to travel"
       exit
     end
-    moves = [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]]
-    queue = Array.new [start]
-    until queue.empty?
-      item = queue[0]
-      ShowBoard.new.create_board(item) if show_calc == 'y'
-      current_item = item if item.flatten.length == 2
-      current_item = item[-1] unless item.flatten.length == 2
-      next if item.is_a? Integer
+    calculate_moves(start, prompt_show_calculations)
+  end
 
-      moves.each do |move|
-        new_move = [current_item[0] + move[0], current_item[1] + move[1]]
-        next if item.any? { |coord| coord == new_move }
-        next unless valid?(new_move)
+  def calculate_moves(start, show_calc, queue = Array.new([start]))
+    @queue = queue
+    until @queue.empty?
+      @item = @queue[0]
+      ShowBoard.new.create_board(@item) if show_calc == 'y'
+      @current_item = @item if @item.flatten.length == 2
+      @current_item = @item[-1] unless @item.flatten.length == 2
+      next if @item.is_a? Integer
 
-        ReachEnd.new.reach_end(item, new_move) if new_move == finish
-        if item.flatten.length == 2
-          queue.push [item, new_move]
-        else
-          queue.push item + [new_move]
-        end
-      end
-      queue.shift
+      [[1, 2], [2, 1], [2, -1], [1, -2], [-1, -2], [-2, -1], [-2, 1], [-1, 2]].each { |move| calculate_move(move) }
+      @queue.shift
     end
+  end
+
+  def calculate_move(move)
+    new_move = [@current_item[0] + move[0], @current_item[1] + move[1]]
+    return if @item.any? { |coord| coord == new_move }
+    return unless valid?(new_move)
+
+    ReachEnd.new.reach_end(@item, new_move) if new_move == @finish
+    add_move(new_move)
   end
 
   def valid?(move)
     move[0].between?(1, 8) && move[1].between?(1, 8) ? true : false
+  end
+
+  def prompt_show_calculations
+    puts 'Would you like to see the calculations live? (y/n)'
+    show_calc = gets.chomp
+    until %w[y n].include? show_calc
+      puts 'Would you like to see the calculations live? (y/n)'
+      show_calc = gets.chomp
+    end
+    show_calc
+  end
+
+  def add_move(new_move)
+    if @item.flatten.length == 2
+      @queue.push [@item, new_move]
+    else
+      @queue.push @item + [new_move]
+    end
+    @queue
   end
 end
 
