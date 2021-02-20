@@ -1,7 +1,20 @@
 # frozen_string_literal: true
 
+# Modifies the array of positions
+module CoordinateModification
+  def combine_start_finish(start, finish)
+    if start.flatten.length == 2
+      start = [start, finish]
+    else
+      start.push finish
+    end
+    start
+  end
+end
+
 # Gets path from inputted start to finish
 class Knight
+  include CoordinateModification
   def knight_moves(start, finish)
     @finish = finish
     require 'colorize'
@@ -31,7 +44,7 @@ class Knight
     return if @item.any? { |coord| coord == new_move }
     return unless valid?(new_move)
 
-    ReachEnd.new.reach_end(@item, new_move) if new_move == @finish
+    ReachEnd.new.reach_end(combine_start_finish(@item, new_move)) if new_move == @finish
     add_move(new_move)
   end
 
@@ -41,10 +54,10 @@ class Knight
 
   def prompt_show_calculations
     puts 'Would you like to see the calculations live? (y/n)'
-    show_calc = gets.chomp
+    show_calc = gets.chomp.downcase
     until %w[y n].include? show_calc
       puts 'Would you like to see the calculations live? (y/n)'
-      show_calc = gets.chomp
+      show_calc = gets.chomp.downcase
     end
     show_calc
   end
@@ -63,6 +76,7 @@ public
 
 # Displays current path on a chess grid
 class ShowBoard
+  include CoordinateModification
   def create_board(start)
     sleep(1.0/20)
     8.downto(1) { |ind| create_row(ind, start) }
@@ -79,6 +93,7 @@ class ShowBoard
   end
 
   def create_cell(row, column, coords, move = '       ', pos = [column, row])
+    # p coords
     coords.each_with_index do |coord, ind|
       next unless pos == coord
 
@@ -92,10 +107,10 @@ end
 
 # Shows results when the knight reaches the end
 class ReachEnd
-  def reach_end(start, finish)
-    ShowBoard.new.create_board(start)
-    puts "The knight reaches its destination in #{start.length - 1} move#{'s' if start.length > 1}. Here is its trail:"
-    show_path(convert_to_coords(combine_start_finish(start, finish)))
+  def reach_end(trail)
+    ShowBoard.new.create_board(trail)
+    puts "The knight reaches its destination in #{trail.length - 1} move#{'s' if trail.length > 2}. Here is its trail:"
+    show_path(convert_to_coords(trail))
     exit
   end
 
@@ -107,18 +122,10 @@ class ReachEnd
     end
   end
 
-  def combine_start_finish(start, finish)
-    if start.flatten.length == 2
-      start = [start, finish]
-    else
-      start.push finish
-    end
-    start
-  end
-
   def convert_to_coords(start, possible_x = %w[A B C D E F G H])
     start.map { |move| [possible_x[move[0] - 1], move[1]] }
   end
 end
+
 
 Knight.new.knight_moves([8, 8], [1, 1])
