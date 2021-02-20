@@ -25,6 +25,8 @@ class Knight
     calculate_moves(start, prompt_show_calculations)
   end
 
+  private
+
   def calculate_moves(start, show_calc, queue = Array.new([start]))
     @queue = queue
     until @queue.empty?
@@ -72,17 +74,17 @@ class Knight
   end
 end
 
-public
-
 # Displays current path on a chess grid
 class ShowBoard
   include CoordinateModification
   def create_board(start)
-    sleep(1.0/20)
+    sleep(1.0 / 20)
     8.downto(1) { |ind| create_row(ind, start) }
     puts '   +-------+-------+-------+-------+-------+-------+-------+-------+'
     puts "       A       B       C       D       E       F       G       H\n\n"
   end
+
+  private
 
   def create_row(row, coords)
     puts '   +-------+-------+-------+-------+-------+-------+-------+-------+'
@@ -114,10 +116,12 @@ class ReachEnd
     exit
   end
 
+  private
+
   def show_path(coords)
     coords.each_with_index do |coord, ind|
       pos = "Move #{ind}"
-      pos = 'Start' if ind == 0
+      pos = 'Start' if ind.zero?
       puts "#{pos}: #{coord.join}"
     end
   end
@@ -127,5 +131,4 @@ class ReachEnd
   end
 end
 
-
-Knight.new.knight_moves([8, 8], [1, 1])
+Knight.new.knight_moves([5, 4], [1, 8])
